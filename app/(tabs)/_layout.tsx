@@ -1,66 +1,59 @@
-import { Ionicons } from "@expo/vector-icons";
+import * as Haptics from "expo-haptics";
 import { Tabs } from "expo-router";
+import { NativeTabs } from "expo-router/native-tabs";
+import { Platform } from "react-native";
+import { FloatingTabBar } from "../../components/FloatingTabBar";
 import { colors } from "../../constants/theme";
 
-type IconName = React.ComponentProps<typeof Ionicons>["name"];
+function tabHaptic() {
+  void Haptics.selectionAsync();
+}
 
-function tabIcon(name: IconName, focusedName: IconName) {
-  return ({ color, focused, size }: { color: string; focused: boolean; size: number }) => (
-    <Ionicons name={focused ? focusedName : name} size={size} color={color} />
+function AndroidTabs() {
+  return (
+    <Tabs
+      tabBar={(props) => <FloatingTabBar {...props} />}
+      screenOptions={{ headerShown: false }}
+    >
+      <Tabs.Screen name="index" options={{ title: "Today" }} />
+      <Tabs.Screen name="log" options={{ title: "Log" }} />
+      <Tabs.Screen name="insights" options={{ title: "Insights" }} />
+      <Tabs.Screen name="profile" options={{ title: "Profile" }} />
+    </Tabs>
+  );
+}
+
+function IosTabs() {
+  return (
+    <NativeTabs
+      minimizeBehavior="onScrollDown"
+      tintColor={colors.primary}
+      iconColor={{ default: colors.tabInactive, selected: colors.primary }}
+      labelStyle={{
+        default: { color: colors.tabInactive, fontSize: 11, fontWeight: "500" },
+        selected: { color: colors.primary, fontSize: 11, fontWeight: "600" },
+      }}
+    >
+      <NativeTabs.Trigger name="index" listeners={{ tabPress: tabHaptic }}>
+        <NativeTabs.Trigger.Label>Today</NativeTabs.Trigger.Label>
+        <NativeTabs.Trigger.Icon sf={{ default: "sun.max", selected: "sun.max.fill" }} />
+      </NativeTabs.Trigger>
+      <NativeTabs.Trigger name="log" listeners={{ tabPress: tabHaptic }}>
+        <NativeTabs.Trigger.Label>Log</NativeTabs.Trigger.Label>
+        <NativeTabs.Trigger.Icon sf={{ default: "plus.circle", selected: "plus.circle.fill" }} />
+      </NativeTabs.Trigger>
+      <NativeTabs.Trigger name="insights" listeners={{ tabPress: tabHaptic }}>
+        <NativeTabs.Trigger.Label>Insights</NativeTabs.Trigger.Label>
+        <NativeTabs.Trigger.Icon sf="chart.xyaxis.line" />
+      </NativeTabs.Trigger>
+      <NativeTabs.Trigger name="profile" listeners={{ tabPress: tabHaptic }}>
+        <NativeTabs.Trigger.Label>Profile</NativeTabs.Trigger.Label>
+        <NativeTabs.Trigger.Icon sf={{ default: "person", selected: "person.fill" }} />
+      </NativeTabs.Trigger>
+    </NativeTabs>
   );
 }
 
 export default function TabsLayout() {
-  return (
-    <Tabs
-      screenOptions={{
-        headerStyle: { backgroundColor: colors.background },
-        headerShadowVisible: false,
-        headerTintColor: colors.text,
-        headerTitleStyle: { fontWeight: "600" },
-        tabBarActiveTintColor: colors.primary,
-        tabBarInactiveTintColor: colors.tabInactive,
-        tabBarStyle: {
-          backgroundColor: colors.surface,
-          borderTopColor: colors.border,
-          height: 88,
-          paddingTop: 6,
-        },
-        tabBarLabelStyle: {
-          fontSize: 12,
-          fontWeight: "500",
-          marginBottom: 8,
-        },
-      }}
-    >
-      <Tabs.Screen
-        name="index"
-        options={{
-          title: "Today",
-          tabBarIcon: tabIcon("sunny-outline", "sunny"),
-        }}
-      />
-      <Tabs.Screen
-        name="log"
-        options={{
-          title: "Log",
-          tabBarIcon: tabIcon("add-circle-outline", "add-circle"),
-        }}
-      />
-      <Tabs.Screen
-        name="insights"
-        options={{
-          title: "Insights",
-          tabBarIcon: tabIcon("analytics-outline", "analytics"),
-        }}
-      />
-      <Tabs.Screen
-        name="profile"
-        options={{
-          title: "Profile",
-          tabBarIcon: tabIcon("person-outline", "person"),
-        }}
-      />
-    </Tabs>
-  );
+  return Platform.OS === "ios" ? <IosTabs /> : <AndroidTabs />;
 }
