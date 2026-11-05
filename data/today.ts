@@ -51,12 +51,38 @@ export type TodaySnapshot = {
   };
   entries: TodayLogEntry[];
   week: WeekDay[];
-  insight: {
-    title: string;
-    body: string;
-    confidence: "low" | "moderate" | "high";
-  } | null;
+  insight: TodayInsight | null;
 };
+
+/** Evidence-backed insight card — see 04_AI_Insights_Analytics. */
+export type TodayInsight = {
+  /** Short line under Today — replaces the motivation quote when ready */
+  oneLiner: string;
+  /** Specific observation headline (not a diagnosis) */
+  title: string;
+  /** Short summary / what changed */
+  body: string;
+  confidence: "low" | "moderate" | "high";
+  periodLabel: string;
+  whatChanged: string;
+  contributors: string[];
+  whyItMatters: string;
+  actions: string[];
+  evidence: string;
+  uncertainty: string;
+};
+
+/** Fallback under Today until a personalized insight one-liner exists. */
+export const TODAY_QUOTES = [
+  { text: "Small steps today. Stronger you tomorrow.", by: "daily note" },
+  { text: "Consistency beats intensity — show up once more.", by: "daily note" },
+  { text: "You don’t need a perfect day. You need this day.", by: "daily note" },
+  { text: "Move a little. Eat honest. Rest like it matters.", by: "daily note" },
+];
+
+export function todaysQuote(date = new Date()) {
+  return TODAY_QUOTES[date.getDate() % TODAY_QUOTES.length]!;
+}
 
 function buildWeek(): WeekDay[] {
   const labels = ["M", "T", "W", "T", "F", "S", "S"];

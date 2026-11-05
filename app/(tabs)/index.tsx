@@ -12,10 +12,15 @@ import {
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import { StatsCardStack } from "../../components/today/StatsCardStack";
 import { TodayFeed } from "../../components/today/TodayFeed";
+import { TodayInsightSection } from "../../components/today/TodayInsight";
 import { WeekStrip } from "../../components/today/WeekStrip";
 import { FLOATING_TAB_BAR_GAP, FLOATING_TAB_BAR_HEIGHT } from "../../constants/layout";
 import { colors, fonts } from "../../constants/theme";
-import { emptyToday } from "../../data/today";
+import {
+  emptyToday,
+  todaysQuote,
+  type TodaySnapshot,
+} from "../../data/today";
 
 function formatToday() {
   return new Date().toLocaleDateString(undefined, {
@@ -23,6 +28,45 @@ function formatToday() {
     month: "short",
     day: "numeric",
   });
+}
+
+/** Quote until insight.oneLiner lands — same slot, crossfades when data arrives. */
+function HeroLine({ insight }: { insight: TodaySnapshot["insight"] }) {
+  const quote = todaysQuote();
+  const personalized = Boolean(insight?.oneLiner);
+  const line = insight?.oneLiner ?? quote.text;
+  const by = personalized ? "for you" : quote.by;
+  const opacity = useRef(new Animated.Value(1)).current;
+  const prevKey = useRef(insight?.oneLiner ?? quote.text);
+
+  useEffect(() => {
+    const next = insight?.oneLiner ?? quote.text;
+    if (next === prevKey.current) return;
+    prevKey.current = next;
+    opacity.setValue(0);
+    Animated.timing(opacity, {
+      toValue: 1,
+      duration: 320,
+      useNativeDriver: true,
+    }).start();
+  }, [insight?.oneLiner, quote.text, opacity]);
+
+  const content = (
+    <Animated.View style={[styles.quote, { opacity }]}>
+      <Text style={[styles.quoteText, personalized && styles.quoteTextInsight]}>
+        {personalized ? line : `“${line}”`}
+      </Text>
+      <Text style={styles.quoteBy}>— {by}</Text>
+    </Animated.View>
+  );
+
+  if (!personalized) return content;
+
+  return (
+    <Pressable onPress={() => router.push("/insights")} accessibilityRole="button">
+      {content}
+    </Pressable>
+  );
 }
 
 export default function TodayScreen() {
@@ -62,21 +106,12 @@ export default function TodayScreen() {
             <Text style={styles.date}>{formatToday()}</Text>
           </View>
 
+          <HeroLine insight={data.insight} />
+
           <StatsCardStack data={data} />
           <WeekStrip week={data.week} />
           <TodayFeed entries={data.entries} />
-
-          <View style={styles.insight}>
-            <View style={styles.header}>
-              <Text style={styles.sectionTitle}>Insight</Text>
-              <Pressable onPress={() => router.push("/insights")} hitSlop={8}>
-                <Text style={styles.sectionAction}>Open</Text>
-              </Pressable>
-            </View>
-            <Text style={styles.insightBody}>
-              {data.insight?.body ?? "No insight yet — needs logged data first."}
-            </Text>
-          </View>
+          <TodayInsightSection insight={data.insight} />
         </Animated.ScrollView>
       </SafeAreaView>
     </View>
@@ -111,29 +146,24 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: colors.textMuted,
   },
-  insight: {
-    marginTop: 28,
+  quote: {
+    marginTop: 10,
+    marginBottom: 2,
   },
-  header: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "baseline",
-    marginBottom: 8,
-  },
-  sectionTitle: {
-    fontFamily: fonts.bodyBold,
+  quoteText: {
+    fontFamily: fonts.displayItalic,
     fontSize: 16,
+    lineHeight: 22,
     color: colors.text,
   },
-  sectionAction: {
-    fontFamily: fonts.bodyBold,
-    fontSize: 14,
-    color: colors.primary,
+  quoteTextInsight: {
+    fontFamily: fonts.display,
+    fontStyle: "normal",
   },
-  insightBody: {
-    fontFamily: fonts.body,
-    fontSize: 15,
-    lineHeight: 22,
+  quoteBy: {
+    marginTop: 4,
+    fontFamily: fonts.bodyMedium,
+    fontSize: 12,
     color: colors.textMuted,
   },
 });
