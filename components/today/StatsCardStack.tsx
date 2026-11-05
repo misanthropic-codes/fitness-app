@@ -10,6 +10,8 @@ import {
 } from "react-native";
 import type { TodaySnapshot } from "../../data/today";
 import { colors, fonts, radii } from "../../constants/theme";
+import { BodyCard } from "./BodyCard";
+import { MoveCard } from "./MoveCard";
 
 type Props = { data: TodaySnapshot };
 
@@ -71,52 +73,6 @@ function FuelCard({ data }: Props) {
         <Macro label="Protein" logged={data.proteinLogged} target={data.proteinTarget} />
         <Macro label="Carbs" logged={data.carbsLogged} target={data.carbsTarget} />
         <Macro label="Fat" logged={data.fatLogged} target={data.fatTarget} />
-      </View>
-    </View>
-  );
-}
-
-function MoveCard({ data }: Props) {
-  return (
-    <View style={styles.card}>
-      <Text style={styles.cardEyebrow}>Move</Text>
-      <Text style={styles.bigNumber}>
-        {data.steps == null ? "—" : data.steps.toLocaleString()}
-      </Text>
-      <Text style={styles.bigUnit}>steps</Text>
-      <View style={styles.pairRow}>
-        <View style={styles.pair}>
-          <Text style={styles.pairLabel}>Workout</Text>
-          <Text style={styles.pairValue}>
-            {data.workoutMinutes > 0 ? `${data.workoutMinutes} min` : "—"}
-          </Text>
-        </View>
-        <View style={styles.pair}>
-          <Text style={styles.pairLabel}>Burn est.</Text>
-          <Text style={styles.pairValue}>—</Text>
-        </View>
-      </View>
-    </View>
-  );
-}
-
-function BodyCard({ data }: Props) {
-  return (
-    <View style={styles.card}>
-      <Text style={styles.cardEyebrow}>Body</Text>
-      <Text style={styles.bigNumber}>
-        {data.weightKg == null ? "—" : data.weightKg.toFixed(1)}
-      </Text>
-      <Text style={styles.bigUnit}>kg today</Text>
-      <View style={styles.pairRow}>
-        <View style={styles.pair}>
-          <Text style={styles.pairLabel}>7-day avg</Text>
-          <Text style={styles.pairValue}>—</Text>
-        </View>
-        <View style={styles.pair}>
-          <Text style={styles.pairLabel}>vs target</Text>
-          <Text style={styles.pairValue}>—</Text>
-        </View>
       </View>
     </View>
   );

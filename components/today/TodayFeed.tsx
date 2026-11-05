@@ -1,80 +1,49 @@
-import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
-import type { ComponentProps } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import type { TodayLogEntry } from "../../data/today";
 import { colors, fonts, radii } from "../../constants/theme";
 
 type Props = { entries: TodayLogEntry[] };
-type IconName = ComponentProps<typeof Ionicons>["name"];
-type Kind = TodayLogEntry["kind"];
-
-const KIND_META: Record<Kind, { label: string; icon: IconName; iconOn: IconName }> = {
-  meal: { label: "Food", icon: "restaurant-outline", iconOn: "restaurant" },
-  weight: { label: "Weight", icon: "scale-outline", iconOn: "scale" },
-  workout: { label: "Train", icon: "barbell-outline", iconOn: "barbell" },
-  alcohol: { label: "Drink", icon: "wine-outline", iconOn: "wine" },
-  smoking: { label: "Smoke", icon: "flame-outline", iconOn: "flame" },
-};
-
-const TRACK: Kind[] = ["meal", "weight", "workout", "alcohol", "smoking"];
 
 export function TodayFeed({ entries }: Props) {
-  const byKind = TRACK.map((kind) => ({
-    kind,
-    ...KIND_META[kind],
-    items: entries.filter((e) => e.kind === kind),
-  }));
-
   return (
     <View style={styles.wrap}>
       <View style={styles.header}>
         <Text style={styles.title}>Logged today</Text>
-        <Text style={styles.meta}>
-          {entries.length === 0 ? "Nothing yet" : `${entries.length} logged`}
-        </Text>
+        {entries.length > 0 ? (
+          <Text style={styles.meta}>{entries.length}</Text>
+        ) : null}
       </View>
 
-      <View style={styles.list}>
-        {byKind.map(({ kind, label, icon, iconOn, items }, index) => {
-          const done = items.length > 0;
-          const latest = items[items.length - 1];
-          const last = index === byKind.length - 1;
-
-          return (
-            <Pressable
-              key={kind}
-              onPress={() => router.push("/log")}
-              accessibilityRole="button"
-              accessibilityLabel={done ? `${label}, ${latest.title}` : `Log ${label}`}
-              style={({ pressed }) => [
-                styles.row,
-                last && styles.rowLast,
-                pressed && styles.pressed,
-              ]}
+      {entries.length === 0 ? (
+        <Pressable
+          onPress={() => router.push("/log")}
+          accessibilityRole="button"
+          accessibilityLabel="Add first log"
+          style={({ pressed }) => [styles.empty, pressed && styles.pressed]}
+        >
+          <Text style={styles.emptyTitle}>Your day is blank</Text>
+          <Text style={styles.emptyBody}>
+            Meals, training, weight, and lifestyle will land here.
+          </Text>
+          <Text style={styles.emptyCta}>Add first log</Text>
+        </Pressable>
+      ) : (
+        <View style={styles.list}>
+          {entries.map((entry, index) => (
+            <View
+              key={entry.id}
+              style={[styles.row, index === entries.length - 1 && styles.rowLast]}
             >
-              <View style={[styles.iconWrap, done && styles.iconWrapDone]}>
-                <Ionicons
-                  name={done ? iconOn : icon}
-                  size={18}
-                  color={done ? colors.primary : colors.textMuted}
-                />
-              </View>
-
               <View style={styles.main}>
-                <Text style={styles.label}>{label}</Text>
-                <Text style={styles.detail} numberOfLines={1}>
-                  {done ? latest.title : "Not logged"}
-                </Text>
+                <Text style={styles.rowTitle}>{entry.title}</Text>
+                <Text style={styles.rowDetail}>{entry.detail}</Text>
               </View>
-
-              <Text style={[styles.trailing, done && styles.trailingDone]}>
-                {done ? latest.time : "+"}
-              </Text>
-            </Pressable>
-          );
-        })}
-      </View>
+              <Text style={styles.rowTime}>{entry.time}</Text>
+            </View>
+          ))}
+        </View>
+      )}
     </View>
   );
 }
@@ -87,7 +56,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "baseline",
-    marginBottom: 12,
+    marginBottom: 14,
   },
   title: {
     fontFamily: fonts.bodyBold,
@@ -95,67 +64,76 @@ const styles = StyleSheet.create({
     color: colors.text,
   },
   meta: {
-    fontFamily: fonts.bodyMedium,
-    fontSize: 13,
-    color: colors.textMuted,
+    fontFamily: fonts.display,
+    fontSize: 22,
+    color: colors.primary,
   },
-  list: {
+  empty: {
+    paddingVertical: 28,
+    paddingHorizontal: 20,
     borderRadius: radii.md,
-    backgroundColor: "rgba(255,255,255,0.72)",
+    backgroundColor: "rgba(255,255,255,0.55)",
     borderWidth: StyleSheet.hairlineWidth,
     borderColor: colors.border,
-    overflow: "hidden",
+    alignItems: "flex-start",
+  },
+  pressed: {
+    opacity: 0.85,
+  },
+  emptyTitle: {
+    fontFamily: fonts.display,
+    fontSize: 22,
+    lineHeight: 26,
+    color: colors.text,
+  },
+  emptyBody: {
+    marginTop: 8,
+    fontFamily: fonts.body,
+    fontSize: 14,
+    lineHeight: 20,
+    color: colors.textMuted,
+    maxWidth: 260,
+  },
+  emptyCta: {
+    marginTop: 16,
+    fontFamily: fonts.bodyBold,
+    fontSize: 14,
+    color: colors.primary,
+  },
+  list: {
+    gap: 0,
   },
   row: {
     flexDirection: "row",
-    alignItems: "center",
-    gap: 12,
+    alignItems: "flex-start",
+    justifyContent: "space-between",
+    gap: 16,
     paddingVertical: 14,
-    paddingHorizontal: 14,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: colors.border,
+    borderTopWidth: StyleSheet.hairlineWidth,
+    borderTopColor: colors.border,
   },
   rowLast: {
-    borderBottomWidth: 0,
-  },
-  pressed: {
-    backgroundColor: "rgba(31,79,63,0.04)",
-  },
-  iconWrap: {
-    width: 36,
-    height: 36,
-    borderRadius: 10,
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: "rgba(20,32,27,0.05)",
-  },
-  iconWrapDone: {
-    backgroundColor: colors.primaryMuted,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: colors.border,
   },
   main: {
     flex: 1,
   },
-  label: {
+  rowTitle: {
     fontFamily: fonts.bodyBold,
-    fontSize: 14,
+    fontSize: 15,
     color: colors.text,
   },
-  detail: {
-    marginTop: 2,
+  rowDetail: {
+    marginTop: 3,
     fontFamily: fonts.body,
     fontSize: 13,
     color: colors.textMuted,
   },
-  trailing: {
-    fontFamily: fonts.bodyBold,
-    fontSize: 18,
-    color: colors.primary,
-    minWidth: 28,
-    textAlign: "right",
-  },
-  trailingDone: {
+  rowTime: {
     fontFamily: fonts.bodyMedium,
     fontSize: 12,
     color: colors.textMuted,
+    marginTop: 2,
   },
 });

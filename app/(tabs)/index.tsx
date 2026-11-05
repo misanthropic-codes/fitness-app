@@ -10,7 +10,6 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
-import { QuickActions } from "../../components/today/QuickActions";
 import { StatsCardStack } from "../../components/today/StatsCardStack";
 import { TodayFeed } from "../../components/today/TodayFeed";
 import { WeekStrip } from "../../components/today/WeekStrip";
@@ -64,7 +63,6 @@ export default function TodayScreen() {
           </View>
 
           <StatsCardStack data={data} />
-          <QuickActions />
           <WeekStrip week={data.week} />
           <TodayFeed entries={data.entries} />
 
