@@ -135,7 +135,7 @@ export function BodyCard({ data }: Props) {
       <View
         ref={cardRef as never}
         collapsable={false}
-        style={[styles.card, expanded && styles.cardHidden]}
+        style={styles.card}
       >
         <View style={styles.top}>
           <Text style={styles.eyebrow}>Body</Text>
@@ -192,7 +192,6 @@ const styles = StyleSheet.create({
     borderWidth: StyleSheet.hairlineWidth,
     borderColor: colors.border,
   },
-  cardHidden: { opacity: 0 },
   face: { flex: 1, padding: 18 },
   top: {
     flexDirection: "row",

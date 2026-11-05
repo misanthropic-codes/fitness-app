@@ -11,6 +11,7 @@ import {
 import type { TodaySnapshot } from "../../data/today";
 import { colors, fonts, radii } from "../../constants/theme";
 import { BodyCard } from "./BodyCard";
+import { LifestyleCard } from "./LifestyleCard";
 import { MoveCard } from "./MoveCard";
 
 type Props = { data: TodaySnapshot };
@@ -73,36 +74,6 @@ function FuelCard({ data }: Props) {
         <Macro label="Protein" logged={data.proteinLogged} target={data.proteinTarget} />
         <Macro label="Carbs" logged={data.carbsLogged} target={data.carbsTarget} />
         <Macro label="Fat" logged={data.fatLogged} target={data.fatTarget} />
-      </View>
-    </View>
-  );
-}
-
-function LifestyleCard({ data }: Props) {
-  return (
-    <View style={styles.card}>
-      <Text style={styles.cardEyebrow}>Lifestyle</Text>
-      <View style={styles.pairRow}>
-        <View style={[styles.pair, styles.pairGrow]}>
-          <Text style={styles.pairLabel}>Alcohol</Text>
-          <Text style={styles.pairValueLg}>
-            {data.alcoholServings === 0 ? "0" : data.alcoholServings}
-          </Text>
-          <Text style={styles.pairHint}>
-            {data.alcoholServings === 0
-              ? "alcohol-free"
-              : `~${Math.round(data.alcoholEthanolG)}g ethanol`}
-          </Text>
-        </View>
-        <View style={[styles.pair, styles.pairGrow]}>
-          <Text style={styles.pairLabel}>Smoking</Text>
-          <Text style={styles.pairValueLg}>
-            {data.cigarettes === 0 ? "0" : data.cigarettes}
-          </Text>
-          <Text style={styles.pairHint}>
-            {data.cigarettes === 0 ? "smoke-free" : "logged today"}
-          </Text>
-        </View>
       </View>
     </View>
   );

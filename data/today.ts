@@ -44,6 +44,11 @@ export type TodaySnapshot = {
   alcoholServings: number;
   alcoholEthanolG: number;
   cigarettes: number;
+  lifestyleHistory: {
+    week: { label: string; alcohol: number; cigarettes: number }[];
+    month: { label: string; alcohol: number; cigarettes: number }[];
+    year: { label: string; alcohol: number; cigarettes: number }[];
+  };
   entries: TodayLogEntry[];
   week: WeekDay[];
   insight: {
@@ -133,6 +138,31 @@ export const emptyToday: TodaySnapshot = {
   alcoholServings: 0,
   alcoholEthanolG: 0,
   cigarettes: 0,
+  // shortcut: seed UI for lifestyle expand, replace with API aggregates
+  lifestyleHistory: {
+    week: [
+      { label: "M", alcohol: 0, cigarettes: 0 },
+      { label: "T", alcohol: 2, cigarettes: 0 },
+      { label: "W", alcohol: 0, cigarettes: 0 },
+      { label: "T", alcohol: 0, cigarettes: 3 },
+      { label: "F", alcohol: 3, cigarettes: 0 },
+      { label: "S", alcohol: 1, cigarettes: 0 },
+      { label: "S", alcohol: 0, cigarettes: 0 },
+    ],
+    month: [
+      { label: "W1", alcohol: 4, cigarettes: 2 },
+      { label: "W2", alcohol: 2, cigarettes: 0 },
+      { label: "W3", alcohol: 5, cigarettes: 4 },
+      { label: "W4", alcohol: 3, cigarettes: 0 },
+    ],
+    year: ["J", "F", "M", "A", "M", "J", "J", "A", "S", "O", "N", "D"].map(
+      (label, i) => ({
+        label,
+        alcohol: 8 + ((i * 3) % 10),
+        cigarettes: (i * 2) % 7,
+      }),
+    ),
+  },
   entries: [],
   week: buildWeek(),
   insight: null,

@@ -38,7 +38,7 @@ export function MoveCard({ data }: Props) {
         // Animated/View ref typing is weak in RN 0.88; only need measureInWindow.
         ref={cardRef as never}
         collapsable={false}
-        style={[styles.card, expanded && styles.cardHidden]}
+        style={styles.card}
       >
         <View style={styles.top}>
           <Text style={styles.eyebrow}>Move</Text>
@@ -105,9 +105,6 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(255,255,255,0.72)",
     borderWidth: StyleSheet.hairlineWidth,
     borderColor: colors.border,
-  },
-  cardHidden: {
-    opacity: 0,
   },
   top: {
     flexDirection: "row",

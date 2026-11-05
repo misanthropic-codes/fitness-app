@@ -110,6 +110,12 @@ export function CardExpandOverlay({
     top: target.y,
     width: target.w,
     height: target.h,
+    // Only fix: hide the overlay before the squash frames; real card sits underneath.
+    opacity: progress.interpolate({
+      inputRange: [0, 0.22, 0.35, 1],
+      outputRange: [0, 0, 1, 1],
+      extrapolate: "clamp" as const,
+    }),
     transform: [
       {
         translateX: progress.interpolate({
