@@ -1,8 +1,9 @@
 import * as Haptics from "expo-haptics";
-import { Tabs } from "expo-router";
+import { Redirect, Tabs } from "expo-router";
 import { NativeTabs } from "expo-router/native-tabs";
-import { Platform } from "react-native";
+import { ActivityIndicator, Platform, View } from "react-native";
 import { FloatingTabBar } from "../../components/FloatingTabBar";
+import { useAuth } from "../../context/AuthContext";
 import { colors } from "../../constants/theme";
 
 function tabHaptic() {
@@ -55,5 +56,26 @@ function IosTabs() {
 }
 
 export default function TabsLayout() {
+  const { user, loading } = useAuth();
+
+  if (loading) {
+    return (
+      <View
+        style={{
+          flex: 1,
+          alignItems: "center",
+          justifyContent: "center",
+          backgroundColor: colors.background,
+        }}
+      >
+        <ActivityIndicator color={colors.primary} />
+      </View>
+    );
+  }
+  if (!user) return <Redirect href="/(auth)/login" />;
+  if (!user.profile?.onboardingComplete) {
+    return <Redirect href="/(onboarding)/setup" />;
+  }
+
   return Platform.OS === "ios" ? <IosTabs /> : <AndroidTabs />;
 }
